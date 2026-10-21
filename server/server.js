@@ -39,6 +39,7 @@ app.set("trust proxy", 1);
 const allowedOrigins = new Set([
   "http://localhost:3000",
   "http://127.0.0.1:3000",
+   "https://ai-trip-planner-dikumr526-supritha-internship-projects.vercel.app",
 ]);
 
 // Add origins configured for deployment
