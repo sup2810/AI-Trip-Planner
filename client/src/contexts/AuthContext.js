@@ -108,61 +108,90 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  const login = async (email, password) => {
-    try {
-      dispatch({ type: "AUTH_START" });
-      const response = await api.post("/auth/login", { email, password });
+  
+const login = async (email, password) => {
+  try {
+    dispatch({ type: "AUTH_START" });
 
-      const { user, token } = response.data;
-      
-      if (token) {
-        localStorage.setItem("token", token);
-      }
+    const response = await api.post("/auth/login", {
+      email,
+      password,
+    });
 
-      dispatch({
-        type: "AUTH_SUCCESS",
-        payload: { user, token },
-      });
+    const user = response.data.user;
+    const token = response.data.accessToken || response.data.token;
 
-      toast.success("Login successful!");
-      navigate("/dashboard");
-
-      return { success: true };
-    } catch (error) {
-      dispatch({ type: "AUTH_FAIL" });
-      const message = error.response?.data?.message || "Login failed";
-      toast.error(message);
-      return { success: false, message };
+    if (!token) {
+      throw new Error("Login response did not include an access token");
     }
-  };
 
-  const register = async (userData) => {
-    try {
-      dispatch({ type: "AUTH_START" });
-      const response = await api.post("/auth/register", userData);
+    localStorage.setItem("token", token);
 
-      const { user, token } = response.data;
-      
-      if (token) {
-        localStorage.setItem("token", token);
-      }
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-      dispatch({
-        type: "AUTH_SUCCESS",
-        payload: { user, token },
-      });
+    dispatch({
+      type: "AUTH_SUCCESS",
+      payload: { user, token },
+    });
 
-      toast.success("Registration successful!");
-      navigate("/dashboard");
+    toast.success("Login successful!");
+    navigate("/dashboard");
 
-      return { success: true };
-    } catch (error) {
-      dispatch({ type: "AUTH_FAIL" });
-      const message = error.response?.data?.message || "Registration failed";
-      toast.error(message);
-      return { success: false, message };
+    return { success: true };
+  } catch (error) {
+    dispatch({ type: "AUTH_FAIL" });
+
+    const message =
+      error.response?.data?.message ||
+      error.message ||
+      "Login failed";
+
+    toast.error(message);
+    return { success: false, message };
+  }
+};
+
+
+  
+const register = async (userData) => {
+  try {
+    dispatch({ type: "AUTH_START" });
+
+    const response = await api.post("/auth/register", userData);
+
+    const user = response.data.user;
+    const token = response.data.accessToken || response.data.token;
+
+    if (!token) {
+      throw new Error("Registration response did not include an access token");
     }
-  };
+
+    localStorage.setItem("token", token);
+
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+    dispatch({
+      type: "AUTH_SUCCESS",
+      payload: { user, token },
+    });
+
+    toast.success("Registration successful!");
+    navigate("/dashboard");
+
+    return { success: true };
+  } catch (error) {
+    dispatch({ type: "AUTH_FAIL" });
+
+    const message =
+      error.response?.data?.message ||
+      error.message ||
+      "Registration failed";
+
+    toast.error(message);
+    return { success: false, message };
+  }
+};
+
 
   const logout = async () => {
     try {
