@@ -41,6 +41,8 @@ const allowedOrigins = new Set([
   "http://127.0.0.1:3000",
    "https://ai-trip-planner-p1489qtgc-supritha-internship-projects.vercel.app",
    "https://ai-trip-planner-dikumr526-supritha-internship-projects.vercel.app",
+   "https://ai-trip-planner-97jg0rdln-supritha-internship-projects.vercel.app",
+   "https://ai-trip-planner-delta-ten.vercel.app",
 ]);
 
 // Add origins configured for deployment
